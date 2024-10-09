@@ -1,147 +1,353 @@
+<a name="readme-top"></a>
 
-[![PyPI version](https://badge.fury.io/py/pyautogen.svg)](https://badge.fury.io/py/pyautogen)
-[![Build](https://github.com/microsoft/autogen/actions/workflows/python-package.yml/badge.svg)](https://github.com/microsoft/autogen/actions/workflows/python-package.yml)
-![Python Version](https://img.shields.io/badge/3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11-blue)
-[![](https://img.shields.io/discord/1153072414184452236?logo=discord&style=flat)](https://discord.gg/pAbnFJrkgZ)
+<div align="center">
+<img src="https://microsoft.github.io/autogen/0.2/img/ag.svg" alt="AutoGen Logo" width="100">
 
-This project is a spinoff from [FLAML](https://github.com/microsoft/FLAML).
+[![Twitter](https://img.shields.io/twitter/url/https/twitter.com/cloudposse.svg?style=social&label=Follow%20%40pyautogen)](https://twitter.com/pyautogen)
+
+</div>
 
 # AutoGen
 
-<!-- <p align="center">
-    <img src="https://github.com/microsoft/autogen/blob/main/website/static/img/flaml.svg"  width=200>
-    <br>
-</p> -->
+> [!IMPORTANT]
+> AutoGen 0.4 is a from-the-ground-up rewrite of AutoGen. Learn more about the history, goals and future at [this blog post](https://microsoft.github.io/autogen/blog). We’re excited to work with the community to gather feedback, refine, and improve the project before we officially release 0.4. This is a big change, so AutoGen 0.2 is still available, maintained, and developed in the [0.2 branch](https://github.com/microsoft/autogen/tree/0.2).
 
-:fire: autogen has graduated from [FLAML](https://github.com/microsoft/FLAML) into a new project.
+AutoGen is an open-source framework for building AI agent systems.
+It simplifies the creation of event-driven, distributed, scalable, and resilient agentic applications.
+It allows you to quickly build systems where AI agents collaborate and perform tasks autonomously
+or with human oversight.
 
-<!-- :fire: Heads-up: We're preparing to migrate [autogen](https://microsoft.github.io/FLAML/docs/Use-Cases/Autogen) into a dedicated github repository. Alongside this move, we'll also launch a dedicated Discord server and a website for comprehensive documentation.
+* [Key Features](#key-features)
+* [API Layering](#api-layering)
+* [Quickstart](#quickstart)
+* [Roadmap](#roadmap)
+* [FAQs](#faqs)
 
-:fire: FLAML is highlighted in OpenAI's [cookbook](https://github.com/openai/openai-cookbook#related-resources-from-around-the-web).
+AutoGen streamlines AI development and research, enabling the use of multiple large language models (LLMs), integrated tools, and advanced multi-agent design patterns. You can develop and test your agent systems locally, then deploy to a distributed cloud environment as your needs grow.
 
-:fire: [autogen](https://microsoft.github.io/autogen/) is released with support for ChatGPT and GPT-4, based on [Cost-Effective Hyperparameter Optimization for Large Language Model Generation Inference](https://arxiv.org/abs/2303.04673).
+## Key Features
 
-:fire: FLAML supports Code-First AutoML & Tuning – Private Preview in [Microsoft Fabric Data Science](https://learn.microsoft.com/en-us/fabric/data-science/). -->
+AutoGen offers the following key features:
 
+- **Asynchronous Messaging**: Agents communicate via asynchronous messages, supporting both event-driven and request/response interaction patterns.
+- **Full type support**: use types in all interfaces and enforced type check on build, with a focus on quality and cohesiveness
+- **Scalable & Distributed**: Design complex, distributed agent networks that can operate across organizational boundaries.
+- **Modular & Extensible**: Customize your system with pluggable components: custom agents, tools, memory, and models.
+- **Cross-Language Support**: Interoperate agents across different programming languages. Currently supports Python and .NET, with more languages coming soon.
+- **Observability & Debugging**: Built-in features and tools for tracking, tracing, and debugging agent interactions and workflows, including support for industry standard observability with OpenTelemetry
 
-## What is AutoGen
+<p align="right" style="font-size: 14px; color: #555; margin-top: 20px;">
+  <a href="#readme-top" style="text-decoration: none; color: blue; font-weight: bold;">
+    ↑ Back to Top ↑
+  </a>
+</p>
 
-AutoGen is a framework that enables development of LLM applications using multiple agents that can converse with each other to solve tasks. AutoGen agents are customizable, conversable, and seamlessly allow human participation. They can operate in various modes that employ combinations of LLMs, human inputs, and tools.
+# API Layering
 
-![AutoGen Overview](https://github.com/microsoft/autogen/blob/main/website/static/img/autogen_agentchat.png)
+AutoGen has several packages and is built upon a layered architecture.
+Currently, there are three main APIs your application can target:
 
-* AutoGen enables building next-gen LLM applications based on **multi-agent conversations** with minimal effort. It simplifies the orchestration, automation and optimization of a complex LLM workflow. It maximizes the performance of LLM models and overcomes their weaknesses.
-* It supports **diverse conversation patterns** for complex workflows. With customizable and conversable agents, developers can use AutoGen to build a wide range of conversation patterns concerning conversation autonomy,
-the number of agents, and agent conversation topology.
-* It provides a collection of working systems with different complexities. These systems span a **wide range of applications** from various domains and complexities. This demonstrates how AutoGen can easily support diverse conversation patterns.
-* AutoGen provides a drop-in replacement of `openai.Completion` or `openai.ChatCompletion` as an **enhanced inference API**. It allows easy performance tuning, utilities like API unification and caching, and advanced usage patterns, such as error handling, multi-config inference, context programming, etc.
+- [Core](https://microsoft.github.io/autogen/dev/core-user-guide/index.html)
+- [AgentChat](https://microsoft.github.io/autogen/dev/agentchat-user-guide/index.html)
+- [Extensions](https://microsoft.github.io/autogen/dev/reference/python/autogen_ext/autogen_ext.html)
 
-AutoGen is powered by collaborative [research studies](https://microsoft.github.io/autogen/docs/Research) from Microsoft, Penn State University, and University of Washington.
+## Core
 
-## Installation
+- [Installation](https://microsoft.github.io/autogen/dev/packages/index.html#pkg-info-autogen-core)
+- [Quickstart](https://microsoft.github.io/autogen/dev/core-user-guide/guides/quickstart.html)
 
-AutoGen requires **Python version >= 3.8**. It can be installed from pip:
+The core API of AutoGen, `autogen-core`, is built following the
+[actor model](https://en.wikipedia.org/wiki/Actor_model).
+It supports asynchronous message passing between agents and event-based workflows.
+Agents in the core layer handle and produce typed messages, using either direct messaging,
+which functions like RPC, or via broadcasting to topics, which is pub-sub.
+Agents can be distributed and implemented in different programming languages,
+while still communicating with one another.
+**Start here if you are building scalable, event-driven agentic systems.**
 
-```bash
-pip install pyautogen
-```
+## AgentChat
 
-Minimal dependencies are installed without extra options. You can install extra options based on the feature you need.
-For example, use the following to install the dependencies needed by the [`blendsearch`](https://microsoft.github.io/FLAML/docs/Use-Cases/Tune-User-Defined-Function#blendsearch-economical-hyperparameter-optimization-with-blended-search-strategy) option.
-```bash
-pip install "pyautogen[blendsearch]"
-```
+- [Installation](https://microsoft.github.io/autogen/dev/packages/index.html#pkg-info-autogen-agentchat)
+- [Quickstart](https://microsoft.github.io/autogen/dev/agentchat-user-guide/guides/quickstart.html)
 
-Find more options in [Installation](https://microsoft.github.io/autogen/docs/Installation).
-<!-- Each of the [`notebook examples`](https://github.com/microsoft/autogen/tree/main/notebook) may require a specific option to be installed. -->
+The AgentChat API, `autogen-agentchat`, is task driven and at a high level like AutoGen 0.2.
+It allows you to define conversational agents, compose them into teams and then
+use them to solve tasks.
+AgentChat itself is built on the core layer, but it abstracts away much of its
+low-level system concepts.
+If your workflows don't fit into the AgentChat API, target core instead.
+**Start here if you just want to focus on quickly getting started with multi-agents workflows.**
 
-For LLM inference configurations, check the [FAQ](https://microsoft.github.io/autogen/docs/FAQ#set-your-api-endpoints).
+## Extensions
+
+The extension package `autogen-ext` contains implementations of the core interfaces using 3rd party systems,
+such as OpenAI model client and Azure code executors.
+Besides the built-in extensions, the package accommodates community-contributed
+extensions through namespace sub-packages.
+We look forward to your contributions!
+
+<p align="right" style="font-size: 14px; color: #555; margin-top: 20px;">
+  <a href="#readme-top" style="text-decoration: none; color: blue; font-weight: bold;">
+    ↑ Back to Top ↑
+  </a>
+</p>
 
 ## Quickstart
 
-* Autogen enables the next-gen LLM applications with a generic multi-agent conversation framework. It offers customizable and conversable agents which integrate LLMs, tools, and humans.
-By automating chat among multiple capable agents, one can easily make them collectively perform tasks autonomously or with human feedback, including tasks that require using tools via code. For [example](https://github.com/microsoft/autogen/blob/main/test/twoagent.py),
-```python
-from autogen import AssistantAgent, UserProxyAgent, config_list_from_json
-# Load LLM inference endpoints from an env variable or a file
-# See https://microsoft.github.io/autogen/docs/FAQ#set-your-api-endpoints
-# and OAI_CONFIG_LIST_sample.json
-config_list = config_list_from_json(env_or_file="OAI_CONFIG_LIST")
-assistant = AssistantAgent("assistant", llm_config={"config_list": config_list})
-user_proxy = UserProxyAgent("user_proxy", code_execution_config={"work_dir": "coding"})
-user_proxy.initiate_chat(assistant, message="Plot a chart of NVDA and TESLA stock price change YTD.")
-# This initiates an automated chat between the two agents to solve the task
+### Python (AgentChat)
+
+First install the packages:
+
+```bash
+pip install autogen-agentchat==0.4.0dev0 autogen-ext==0.4.0dev0
 ```
 
-This example can be run with
-```python
-python test/twoagent.py
-```
-After the repo is cloned.
-The figure below shows an example conversation flow with AutoGen.
-![Agent Chat Example](https://github.com/microsoft/autogen/blob/main/website/static/img/chat_example.png)
+The following code uses code execution, you need to have [Docker installed](https://docs.docker.com/engine/install/)
+and running on your machine.
 
-Please find more [code examples](https://microsoft.github.io/autogen/docs/Examples/AutoGen-AgentChat) for this feature.
-
-* Autogen also helps maximize the utility out of the expensive LLMs such as ChatGPT and GPT-4. It offers a drop-in replacement of `openai.Completion` or `openai.ChatCompletion` adding powerful functionalities like tuning, caching, error handling, and templating. For example, you can optimize generations by LLM with your own tuning data, success metrics and budgets.
 ```python
-# perform tuning
-config, analysis = autogen.Completion.tune(
-    data=tune_data,
-    metric="success",
-    mode="max",
-    eval_func=eval_func,
-    inference_budget=0.05,
-    optimization_budget=3,
-    num_samples=-1,
-)
-# perform inference for a test instance
-response = autogen.Completion.create(context=test_instance, **config)
+from autogen_agentchat.agents import CodeExecutorAgent, CodingAssistantAgent
+from autogen_agentchat.teams import RoundRobinGroupChat, StopMessageTermination
+from autogen_core.components.code_executor import DockerCommandLineCodeExecutor
+from autogen_core.components.models import OpenAIChatCompletionClient
+
+async with DockerCommandLineCodeExecutor(work_dir="coding") as code_executor:
+    code_executor_agent = CodeExecutorAgent("code_executor", code_executor=code_executor)
+    coding_assistant_agent = CodingAssistantAgent(
+        "coding_assistant", model_client=OpenAIChatCompletionClient(model="gpt-4o")
+    )
+    group_chat = RoundRobinGroupChat([coding_assistant_agent, code_executor_agent])
+    result = await group_chat.run(
+        task="Create a plot of NVDIA and TSLA stock returns YTD from 2024-01-01 and save it to 'nvidia_tesla_2024_ytd.png'.",
+        termination_condition=StopMessageTermination(),
+    )
 ```
 
-Please find more [code examples](https://microsoft.github.io/autogen/docs/Examples/AutoGen-Inference) for this feature.
+### C#
+The .NET SDK does not yet support all of the interfaces that the python SDK offers but we are working on bringing them to parity.
+To use the .NET SDK, you need to add a package reference to the src in your project.
+We will release nuget packages soon and will update these instructions when that happens.
 
-## Documentation
+```
+git clone https://github.com/microsoft/autogen.git
+cd autogen
+# Switch to the branch that has this code
+git switch staging-dev
+# Build the project
+cd dotnet && dotnet build AutoGen.sln
+# In your source code, add AutoGen to your project
+dotnet add <your.csproj> reference <path to your checkout of autogen>/dotnet/src/Microsoft.AutoGen.Agents/Client/Microsoft.AutoGen.Agents.Client.csproj
+```
 
-You can find a detailed documentation about AutoGen [here](https://microsoft.github.io/autogen/).
+Then, define and run your first agent:
 
-In addition, you can find:
+```csharp
+using Microsoft.AutoGen.Agents.Abstractions;
+using Microsoft.AutoGen.Agents.Client;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
-- [Research](https://microsoft.github.io/autogen/docs/Research) and [blogposts](https://microsoft.github.io/autogen/blog) around AutoGen.
+// send a message to the agent
+var app = await App.PublishMessageAsync("HelloAgents", new NewMessageReceived
+{
+    Message = "World"
+}, local: true);
 
-- [Discord](https://discord.gg/pAbnFJrkgZ).
+await App.RuntimeApp!.WaitForShutdownAsync();
+await app.WaitForShutdownAsync();
 
-- [Contributing guide](https://microsoft.github.io/autogen/docs/Contribute).
+[TopicSubscription("HelloAgents")]
+public class HelloAgent(
+    IAgentContext context,
+    [FromKeyedServices("EventTypes")] EventTypes typeRegistry) : ConsoleAgent(
+        context,
+        typeRegistry),
+        ISayHello,
+        IHandle<NewMessageReceived>,
+        IHandle<ConversationClosed>
+{
+    public async Task Handle(NewMessageReceived item)
+    {
+        var response = await SayHello(item.Message).ConfigureAwait(false);
+        var evt = new Output
+        {
+            Message = response
+        }.ToCloudEvent(this.AgentId.Key);
+        await PublishEvent(evt).ConfigureAwait(false);
+        var goodbye = new ConversationClosed
+        {
+            UserId = this.AgentId.Key,
+            UserMessage = "Goodbye"
+        }.ToCloudEvent(this.AgentId.Key);
+        await PublishEvent(goodbye).ConfigureAwait(false);
+    }
+    public async Task Handle(ConversationClosed item)
+    {
+        var goodbye = $"*********************  {item.UserId} said {item.UserMessage}  ************************";
+        var evt = new Output
+        {
+            Message = goodbye
+        }.ToCloudEvent(this.AgentId.Key);
+        await PublishEvent(evt).ConfigureAwait(false);
+        await Task.Delay(60000);
+        await App.ShutdownAsync();
+    }
+    public async Task<string> SayHello(string ask)
+    {
+        var response = $"\n\n\n\n***************Hello {ask}**********************\n\n\n\n";
+        return response;
+    }
+}
+public interface ISayHello
+{
+    public Task<string> SayHello(string ask);
+}
+```
 
-## Contributing
+```bash
+dotnet run
+```
 
-This project welcomes contributions and suggestions. Most contributions require you to agree to a
-Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
-the rights to use your contribution. For details, visit <https://cla.opensource.microsoft.com>.
+<p align="right" style="font-size: 14px; color: #555; margin-top: 20px;">
+  <a href="#readme-top" style="text-decoration: none; color: blue; font-weight: bold;">
+    ↑ Back to Top ↑
+  </a>
+</p>
 
-If you are new to GitHub [here](https://help.github.com/categories/collaborating-with-issues-and-pull-requests/) is a detailed help source on getting involved with development on GitHub.
+## Roadmap
 
-When you submit a pull request, a CLA bot will automatically determine whether you need to provide
-a CLA and decorate the PR appropriately (e.g., status check, comment). Simply follow the instructions
-provided by the bot. You will only need to do this once across all repos using our CLA.
+- AutoGen 0.2 - This is the current stable release of AutoGen. We will continue to accept bug fixes and minor enhancements to this version.
+- AutoGen 0.4 - This is the first release of the new architecture. This release is still in _preview_. We will be focusing on the stability of the interfaces, documentation, tutorials, samples, and a collection of built-in agents which you can use. We are excited to work with our community to define the future of AutoGen. We are looking for feedback and contributions to help shape the future of this project. Here are some major planned items:
+    - More programming languages (e.g., TypeScript)
+    - More built-in agents and multi-agent workflows
+    - Deployment of distributed agents
+    - Re-implementation/migration of AutoGen Studio
+    - Integration with other agent frameworks and data sources
+    - Advanced RAG techniques and memory services
 
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
-For more information, see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
-contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+<p align="right" style="font-size: 14px; color: #555; margin-top: 20px;">
+  <a href="#readme-top" style="text-decoration: none; color: blue; font-weight: bold;">
+    ↑ Back to Top ↑
+  </a>
+</p>
 
-# Legal Notices
+## FAQs
+
+### What is AutoGen 0.4?
+
+AutoGen v0.4 is a rewrite of AutoGen from the ground up to create a more robust,
+scalable, easier to use, cross-language library for building AI Agents.
+Some key features include asynchronous messaging, support for scalable distributed agents,
+modular extensible design (bring your own agents, implement behaviors however you like),
+cross-language support, improved observability, and full typing integration.
+It is a breaking change.
+
+### Why these changes?
+
+We listened to our AutoGen users, learned from what was working, and adapted to fix what wasn't.
+We brought together wide-ranging teams working on many different types of AI Agents
+and collaborated to design an improved framework with a more flexible
+programming model and better scalability.
+
+### Is this project still maintained?
+
+We want to reaffirm our commitment to supporting both the original version of AutoGen (0.2) and the redesign (0.4) . AutoGen 0.4 is still work-in-progress, and we shared the code now to build with the community. There are no plans to deprecate the original AutoGen anytime soon, and both versions will be actively maintained. 
+
+### Who should use it 0.4?
+
+This code is still experimental, so expect changes and bugs while we work towards a stable 0.4 release. We encourage early adopters to
+try it out, give us feedback, and contribute.
+For those looking for a stable version we recommend to continue using 0.2
+
+### I'm using AutoGen 0.2, should I upgrade?
+
+If you consider yourself an early adopter, you are comfortable making some
+changes to your code, and are willing to try it out, then yes.
+
+### How do I still use AutoGen 0.2?
+
+AutoGen 0.2 can be installed with:
+
+```sh
+pip install autogen-agentchat~=0.2
+```
+
+### Will AutoGen Studio be supported in 0.4?
+
+Yes, this is on the [roadmap](#Roadmap).
+Our current plan is to enable an implementation of AutoGen Studio
+on the AgentChat high level API which implements a set of agent functionalities
+(agents, teams, etc).
+
+### How do I migrate?
+
+For users familiar with AutoGen, the AgentChat library in 0.4 provides similar concepts.
+We are working on a migration guide.
+
+### Is 0.4 done?
+
+We are still actively developing AutoGen 0.4. One exciting new feature is the emergence of new SDKs for .NET. The python SDKs are further ahead at this time but our goal is to achieve parity. We aim to add additional languages in future releases. 
+
+### What is happening next? When will this release be ready?
+
+We are still working on improving the documentation, samples, and enhancing the code. We are hoping to release before the end of the year when things are ready.
+
+### What is the history of this project?
+
+The rearchitecture of the framework started with multiple Microsoft teams coming together
+to address the gaps and learnings from AutoGen 0.2 - merging ideas from several predecessor projects.
+The team worked on this internally for some time to ensure alignment before moving work back to the open in October 2024.
+
+### What is the official channel for support?
+
+Use GitHub [Issues](https://github.com/microsoft/autogen/issues) for bug reports and feature requests.
+Use GitHub [Discussions](https://github.com/microsoft/autogen/discussions) for general questions and discussions.
+
+### Do you use Discord for communications?
+
+We are unable to use Discord for project discussions. Therefore, we request that all discussions take place on https://github.com/microsoft/autogen/discussions/ going forward. 
+
+### What about forks?
+
+https://github.com/microsoft/autogen/ remains the only official repo for development and support of AutoGen. 
+We are aware that there are thousands of forks of AutoGen, including many for personal development and startups building with or on top of the library. We are not involved with any of these forks and are not aware of any plans related to them. 
+
+### What is the status of the license and open source?
+
+Our project remains fully open-source and accessible to everyone. We understand that some forks use different licenses to align with different interests. We will continue to use the most permissive license (MIT) for the project. 
+
+### Can you clarify the current state of the packages?
+Currently, we are unable to make releases to the `pyautogen` package via Pypi due to a change to package ownership that was done without our involvement. Additionally, we are moving to using multiple packages to align with the new design. Please see details [here](https://microsoft.github.io/autogen/dev/packages/index.html). 
+
+### Can I still be involved?
+
+We are grateful to all the contributors to AutoGen 0.2 and we look forward to continuing to collaborate with everyone in the AutoGen community. 
+
+<p align="right" style="font-size: 14px; color: #555; margin-top: 20px;">
+  <a href="#readme-top" style="text-decoration: none; color: blue; font-weight: bold;">
+    ↑ Back to Top ↑
+  </a>
+</p>
+
+## Legal Notices
 
 Microsoft and any contributors grant you a license to the Microsoft documentation and other content
 in this repository under the [Creative Commons Attribution 4.0 International Public License](https://creativecommons.org/licenses/by/4.0/legalcode),
 see the [LICENSE](LICENSE) file, and grant you a license to any code in the repository under the [MIT License](https://opensource.org/licenses/MIT), see the
 [LICENSE-CODE](LICENSE-CODE) file.
 
-Microsoft, Windows, Microsoft Azure and/or other Microsoft products and services referenced in the documentation
+Microsoft, Windows, Microsoft Azure, and/or other Microsoft products and services referenced in the documentation
 may be either trademarks or registered trademarks of Microsoft in the United States and/or other countries.
 The licenses for this project do not grant you rights to use any Microsoft names, logos, or trademarks.
 Microsoft's general trademark guidelines can be found at http://go.microsoft.com/fwlink/?LinkID=254653.
 
-Privacy information can be found at https://privacy.microsoft.com/en-us/
+Privacy information can be found at https://go.microsoft.com/fwlink/?LinkId=521839
 
 Microsoft and any contributors reserve all other rights, whether under their respective copyrights, patents,
-or trademarks, whether by implication, estoppel or otherwise.
+or trademarks, whether by implication, estoppel, or otherwise.
+
+<p align="right" style="font-size: 14px; color: #555; margin-top: 20px;">
+  <a href="#readme-top" style="text-decoration: none; color: blue; font-weight: bold;">
+    ↑ Back to Top ↑
+  </a>
+</p>
