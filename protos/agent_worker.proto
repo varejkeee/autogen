@@ -1,0 +1,115 @@
+syntax = "proto3";
+
+package agents;
+
+option csharp_namespace = "Microsoft.AutoGen.Protobuf";
+
+import "cloudevent.proto";
+import "google/protobuf/any.proto";
+
+
+message AgentId {
+    string type = 1;
+    string key = 2;
+}
+
+message Payload {
+    string data_type = 1;
+    string data_content_type = 2;
+    bytes data = 3;
+}
+
+message RpcRequest {
+    string request_id = 1;
+    optional AgentId source = 2;
+    AgentId target = 3;
+    string method = 4;
+    Payload payload = 5;
+    map<string, string> metadata = 6;
+}
+
+message RpcResponse {
+    string request_id = 1;
+    Payload payload = 2;
+    string error = 3;
+    map<string, string> metadata = 4;
+}
+
+message RegisterAgentTypeRequest {
+    string type = 1;
+}
+
+message RegisterAgentTypeResponse {
+}
+
+message TypeSubscription {
+    string topic_type = 1;
+    string agent_type = 2;
+}
+
+message TypePrefixSubscription {
+    string topic_type_prefix = 1;
+    string agent_type = 2;
+}
+
+message Subscription {
+    string id = 1;
+    oneof subscription {
+        TypeSubscription typeSubscription = 2;
+        TypePrefixSubscription typePrefixSubscription = 3;
+    }
+}
+
+message AddSubscriptionRequest {
+    Subscription subscription = 1;
+}
+
+message AddSubscriptionResponse {
+}
+
+message RemoveSubscriptionRequest {
+    string id = 1;
+}
+
+message RemoveSubscriptionResponse {
+}
+
+message GetSubscriptionsRequest {}
+message GetSubscriptionsResponse {
+    repeated Subscription subscriptions = 1;
+}
+
+message AgentState {
+  AgentId agent_id = 1;
+  string eTag = 2;
+  oneof  data {
+    bytes binary_data = 3;
+    string text_data = 4;
+    google.protobuf.Any proto_data = 5;
+  }
+}
+
+message GetStateResponse {
+	AgentState agent_state = 1;
+}
+
+message SaveStateResponse {
+}
+
+message Message {
+    oneof message {
+        RpcRequest request = 1;
+        RpcResponse response = 2;
+        io.cloudevents.v1.CloudEvent cloudEvent = 3;
+    }
+}
+
+service AgentRpc {
+    rpc OpenChannel (stream Message) returns (stream Message);
+    rpc GetState(AgentId) returns (GetStateResponse);
+    rpc SaveState(AgentState) returns (SaveStateResponse);
+    rpc RegisterAgent(RegisterAgentTypeRequest) returns (RegisterAgentTypeResponse);
+    rpc AddSubscription(AddSubscriptionRequest) returns (AddSubscriptionResponse);
+    rpc RemoveSubscription(RemoveSubscriptionRequest) returns (RemoveSubscriptionResponse);
+    rpc GetSubscriptions(GetSubscriptionsRequest) returns (GetSubscriptionsResponse);
+}
